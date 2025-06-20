@@ -1,0 +1,27 @@
+.footer {
+  background-color: #151c26 !important;
+  text-align: center;
+  z-index: 10;
+}
+
+/* Social icon styling */
+.footer-icon {
+  color: #ffc107;
+  transition: transform 0.3s ease;
+}
+
+.footer-icon:hover {
+  transform: scale(1.2);
+  color: #fff;
+}
+
+/* Force visible and readable copyright text */
+footer .text-muted {
+  color: #ffffff !important;     /* Force white */
+  opacity: 1 !important;         /* Make sure it's fully opaque */
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+}

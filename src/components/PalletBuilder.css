@@ -1,0 +1,49 @@
+/* Custom styles for PalletBuilder component */
+
+.builder-bg {
+  background: linear-gradient(to right, #1e293b, #0f172a);
+  color: #e0e6ed;
+}
+
+.builder-card {
+  background-color: #232b39;
+  border: 1px solid #31394a;
+}
+
+.builder-input,
+.builder-select {
+  background-color: #31394a !important;
+  color: #fff !important;
+  border: 1px solid #475569 !important;
+}
+
+.builder-input:focus,
+.builder-select:focus {
+  border-color: #ffcc00 !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.25) !important;
+}
+
+.builder-card-alt {
+  background-color: #31394a;
+}
+
+.price-box {
+  background-color: #1a2230;
+  border: 1px solid #ffcc00;
+}
+
+.preview-container {
+  background-color: #292b2c;
+  border: 1px solid #475569;
+}
+
+/* 3D Preview Pallet Colors */
+.pallet-base {
+  background-color: #d97706; /* amber-600 */
+}
+.pallet-deck {
+  background-color: #b45309; /* amber-700 */
+}
+.pallet-stringer {
+  background-color: #92400e; /* amber-800 */
+} 

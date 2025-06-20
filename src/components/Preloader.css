@@ -1,0 +1,29 @@
+.preloader-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #111; /* Or #000 if you prefer */
+  color: white;
+  z-index: 9999;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.preloader-spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #ffc107;
+  border-top: 6px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px #ffc107;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

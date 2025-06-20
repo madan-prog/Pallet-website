@@ -1,0 +1,348 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh; /* Ensure full viewport height */
+  overflow-x: hidden; /* Prevent horizontal scrollbar if not needed */
+}
+
+/* You might want to keep text-align: center if it's for specific elements, 
+   but for the root, it's usually not desired for full-page layouts. 
+   If elements within #root are expected to be centered, apply text-align 
+   to their specific containers instead. */
+#root {
+    /* max-width and margin: 0 auto are removed to allow full width */
+    /* padding: 2rem; is removed to allow full height */
+    text-align: center; /* Keep this if you want content within #root to be centered horizontally by default */
+}
+
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Add a style for app-wrapper to ensure it fills the available height */
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1; /* This will make the main content take up all available space */
+}
+
+/* Custom dark file input for QuotationForm */
+.custom-file-dark::-webkit-file-upload-button {
+  background: #232b39 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 0.5em 1.5em !important;
+  border-radius: 0.25rem !important;
+  cursor: pointer !important;
+}
+.custom-file-dark::-ms-browse {
+  background: #232b39 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 0.5em 1.5em !important;
+  border-radius: 0.25rem !important;
+  cursor: pointer !important;
+}
+.custom-file-dark::file-selector-button {
+  background: #232b39 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 0.5em 1.5em !important;
+  border-radius: 0.25rem !important;
+  cursor: pointer !important;
+}
+
+/* Custom file upload box for QuotationForm */
+.custom-file-upload-box {
+  background: #23272f;
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.5rem 1rem;
+  min-height: 48px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  color: #fff;
+}
+.custom-file-upload-box .btn-link {
+  color: #fff !important;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+.custom-file-upload-box .btn-link:focus,
+.custom-file-upload-box .btn-link:hover {
+  color: #FFD600 !important;
+  text-decoration: underline;
+  background: transparent;
+}
+
+/* Make text inside price calculator box light and readable */
+.price-calc-box, .price-calc-box * {
+  color: #e0e6ed !important;
+}
+
+.price-calc-disclaimer {
+  color: #FFD600 !important;
+}
+
+/* Modern dark form controls for QuotationForm */
+.card input,
+.card select,
+.card textarea {
+  background: #23272f !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s;
+}
+
+.card input:focus,
+.card select:focus,
+.card textarea:focus {
+  border-color: #FFD600 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 214, 0, 0.2) !important;
+}
+
+.card label {
+  color: #fff !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.25rem;
+}
+
+.card input::placeholder,
+.card textarea::placeholder,
+.card select:invalid {
+  color: #cfd8dc !important;
+  opacity: 1 !important;
+}
+
+.simulator-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #181e29 0%, #232b39 100%);
+}
+.simulator-page .card,
+.simulator-page .bg-secondary {
+  background: #232b39 !important;
+  border-radius: 1rem !important;
+  border: 1px solid #31394a !important;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+}
+.simulator-page h1, .simulator-page h2, .simulator-page h3, .simulator-page h4 {
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+.simulator-page h1 .text-warning, .simulator-page h2 .text-warning, .simulator-page h3 .text-warning {
+  color: #FFD600 !important;
+}
+.simulator-page .form-label {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.simulator-page input,
+.simulator-page select,
+.simulator-page textarea {
+  background: #23272f !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s;
+}
+.simulator-page input:focus,
+.simulator-page select:focus,
+.simulator-page textarea:focus {
+  border-color: #FFD600 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 214, 0, 0.2) !important;
+}
+.simulator-page input::placeholder,
+.simulator-page textarea::placeholder,
+.simulator-page select:invalid {
+  color: #cfd8dc !important;
+  opacity: 1 !important;
+}
+.simulator-page .btn-success {
+  background: #1ed760 !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+.simulator-page .btn-success:hover {
+  background: #17b34a !important;
+}
+.simulator-page .btn-secondary {
+  background: #31394a !important;
+  border: none !important;
+  color: #fff !important;
+}
+.simulator-page .btn-secondary:hover {
+  background: #232b39 !important;
+}
+.simulator-page .btn-primary {
+  background: #2563eb !important;
+  border: none !important;
+  color: #fff !important;
+}
+.simulator-page .btn-primary:hover {
+  background: #1d4ed8 !important;
+}
+.simulator-page .btn-dark {
+  background: #232b39 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+.simulator-page .btn-dark:hover {
+  background: #151c26 !important;
+}
+.simulator-page .lead, .simulator-page .text-light, .simulator-page .text-white, .simulator-page .text-secondary, .simulator-page .text-success, .simulator-page .text-warning, .simulator-page .text-primary {
+  color: #e0e6ed !important;
+}
+.simulator-page .text-warning {
+  color: #FFD600 !important;
+}
+.simulator-page .rounded {
+  border-radius: 1rem !important;
+}
+.simulator-page .progress {
+  background: #232b39 !important;
+  border-radius: 1rem !important;
+}
+.simulator-page .progress-bar {
+  border-radius: 1rem !important;
+}
+
+.simulator-page input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  border-radius: 3px;
+  outline: none;
+  margin: 0.5rem 0 0.25rem 0;
+  -webkit-appearance: none;
+  border: none !important;
+  box-shadow: none !important;
+}
+.simulator-page input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #2563eb 0%, #2563eb var(--range-progress, 0%), #e0e6ed var(--range-progress, 0%), #e0e6ed 100%);
+}
+.simulator-page input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background 0.2s;
+  position: relative;
+  z-index: 2;
+}
+.simulator-page input[type="range"]:focus::-webkit-slider-thumb {
+  background: #1d4ed8;
+}
+
+/* Firefox */
+.simulator-page input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #2563eb 0%, #2563eb var(--range-progress, 0%), #e0e6ed var(--range-progress, 0%), #e0e6ed 100%);
+}
+.simulator-page input[type="range"]::-moz-range-progress {
+  height: 6px;
+  background: none;
+  border-radius: 3px;
+}
+.simulator-page input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background 0.2s;
+}
+.simulator-page input[type="range"]:focus::-moz-range-thumb {
+  background: #1d4ed8;
+}
+
+/* IE */
+.simulator-page input[type="range"]::-ms-fill-lower {
+  background: #2563eb;
+  border-radius: 3px;
+}
+.simulator-page input[type="range"]::-ms-fill-upper {
+  background: #e0e6ed;
+  border-radius: 3px;
+}
+.simulator-page input[type="range"]::-ms-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background 0.2s;
+}
+.simulator-page input[type="range"]:focus::-ms-thumb {
+  background: #1d4ed8;
+}
+.simulator-page input[type="range"]:focus {
+  outline: none;
+}
+.simulator-page input[type="range"]::-ms-tooltip {
+  display: none;
+}
+
+/* JS to update the --value variable for Chrome/Edge/Safari */
