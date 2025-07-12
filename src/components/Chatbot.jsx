@@ -13,13 +13,14 @@ const SUGGESTIONS = [
 
 function getBotResponse(message) {
   const msg = message.toLowerCase();
+  const words = msg.replace(/[?.,!]/g, '').split(/\s+/);
 
   const keywords = {
     greeting: ['hello', 'hi', 'hey'],
     order: ['order', 'tracking', 'shipment'],
     types: ['types', 'offer', 'products', 'varieties'],
-    heavy: ['heavy', 'strong', 'load'],
-    cold: ['cold', 'freezing', 'temperature'],
+    heavy: ['heavy', 'strong', 'load', 'loads'],
+    cold: ['cold', 'freezing', 'temperature', 'storage'],
     price: ['price', 'cost', 'rate', 'quotation'],
     delivery: ['deliver', 'shipping', 'location', 'city'],
     custom: ['custom', 'size', 'dimension', 'build'],
@@ -38,6 +39,14 @@ function getBotResponse(message) {
     contact: 'You can reach us through the Contact Us page or call our support team.',
   };
 
+  // Prioritize whole-word matching
+  for (const key in keywords) {
+    if (keywords[key].some(keyword => words.includes(keyword))) {
+      return responses[key];
+    }
+  }
+
+  // Fallback to substring matching for broader cases
   for (const key in keywords) {
     if (keywords[key].some(word => msg.includes(word))) {
       return responses[key];
@@ -51,7 +60,7 @@ const Chatbot = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    { from: 'bot', text: 'Hi! I am your Pallet Assistant. How can I help you today?' }
+    { from: 'bot', text: 'Hello! I am your Pallet Assistant. How can I help you today?' }
   ]);
   const [iconHover, setIconHover] = useState(false);
   const messagesEndRef = useRef(null);
@@ -139,6 +148,7 @@ const Chatbot = () => {
             bottom: 110,
             right: 32,
             width: 340,
+            height: 'min(70vh, 600px)',
             maxWidth: '90vw',
             background: '#232b39',
             color: '#fff',
@@ -153,7 +163,7 @@ const Chatbot = () => {
           <div style={{ background: '#FFD600', color: '#232b39', padding: '1rem', fontWeight: 700, fontSize: 18 }}>
             Pallet Chatbot
           </div>
-          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', background: '#232b39' }}>
+          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', background: '#232b39', minHeight: 0 }}>
             {messages.map((msg, idx) => (
               <div key={idx} style={{
                 marginBottom: 12,

@@ -1,22 +1,22 @@
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
 
 export const ThreeDViewer = ({ specs }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
     // Set up scene
-    const scene = new THREE.Scene();
+    const scene = new Scene();
     scene.background = new THREE.Color(0xf0f0f0);
     
     // Set up camera
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
     
     // Set up renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(300, 300);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    const renderer = new WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mountRef.current.appendChild(renderer.domElement);
     
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -57,22 +57,22 @@ export const ThreeDViewer = ({ specs }) => {
       });
       
       // Create base
-      const baseGeometry = new THREE.BoxGeometry(length, height/3, width);
-      const base = new THREE.Mesh(baseGeometry, palletMaterial);
+      const baseGeometry = new BoxGeometry(length, height/3, width);
+      const base = new Mesh(baseGeometry, palletMaterial);
       base.position.y = -height/2 + height/6;
       base.userData.isPallet = true;
       scene.add(base);
       
       // Create deck boards (top)
       const deckBoardHeight = height/6;
-      const deckBoardGeometry = new THREE.BoxGeometry(length, deckBoardHeight, width/8);
+      const deckBoardGeometry = new BoxGeometry(length, deckBoardHeight, width/8);
       
       // Number of deck boards based on size
       const deckBoardCount = Math.max(3, Math.floor(width / 20));
       const spacing = width / (deckBoardCount + 1);
       
       for (let i = 0; i < deckBoardCount; i++) {
-        const deckBoard = new THREE.Mesh(deckBoardGeometry, palletMaterial);
+        const deckBoard = new Mesh(deckBoardGeometry, palletMaterial);
         deckBoard.position.y = height/2 - deckBoardHeight/2;
         deckBoard.position.z = -width/2 + spacing * (i + 1);
         deckBoard.userData.isPallet = true;
@@ -81,12 +81,12 @@ export const ThreeDViewer = ({ specs }) => {
       
       // Create runners
       const runnerWidth = width/10;
-      const runnerGeometry = new THREE.BoxGeometry(length/8, height*0.6, runnerWidth);
+      const runnerGeometry = new BoxGeometry(length/8, height*0.6, runnerWidth);
       const runnerCount = specs.deckType === 'double' ? 4 : 3;
       const runnerSpacing = length / (runnerCount + 1);
       
       for (let i = 0; i < runnerCount; i++) {
-        const runner = new THREE.Mesh(runnerGeometry, palletMaterial);
+        const runner = new Mesh(runnerGeometry, palletMaterial);
         runner.position.x = -length/2 + runnerSpacing * (i + 1);
         runner.position.y = -height/2 + height*0.3;
         runner.userData.isPallet = true;
@@ -96,7 +96,7 @@ export const ThreeDViewer = ({ specs }) => {
       // For double deck, add bottom deck boards
       if (specs.deckType === 'double') {
         for (let i = 0; i < deckBoardCount; i++) {
-          const deckBoard = new THREE.Mesh(deckBoardGeometry, palletMaterial);
+          const deckBoard = new Mesh(deckBoardGeometry, palletMaterial);
           deckBoard.position.y = -height/2 + deckBoardHeight/2;
           deckBoard.position.z = -width/2 + spacing * (i + 1);
           deckBoard.userData.isPallet = true;
@@ -114,10 +114,6 @@ export const ThreeDViewer = ({ specs }) => {
     };
     animate();
     
-    // Add to DOM
-    mountRef.current.appendChild(renderer.domElement);
-    
-    // Clean up
     return () => {
       mountRef.current.removeChild(renderer.domElement);
     };
@@ -125,3 +121,5 @@ export const ThreeDViewer = ({ specs }) => {
   
   return <div ref={mountRef} />;
 };
+
+export default ThreeDViewer;

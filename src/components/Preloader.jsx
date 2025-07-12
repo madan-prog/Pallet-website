@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
-const Preloader = () => {
+const Preloader = ({ size = 60, fullscreen = true, style = {} }) => {
   const loaderRef = useRef(null);
 
   useEffect(() => {
@@ -19,16 +19,40 @@ const Preloader = () => {
     });
   }, []);
 
+  const wrapperStyle = fullscreen
+    ? {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#111',
+        position: 'fixed',
+        width: '100%',
+        zIndex: 9999,
+        top: 0,
+        left: 0,
+        ...style,
+      }
+    : {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        minHeight: size + 20,
+        background: 'none',
+        ...style,
+      };
+
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', backgroundColor: '#111', position: 'fixed', width: '100%', zIndex: 9999 }}>
+    <div style={wrapperStyle}>
       <div
         ref={loaderRef}
         style={{
-          width: '60px',
-          height: '60px',
+          width: size,
+          height: size,
           borderRadius: '50%',
-          border: '6px solid #ffc107',
-          borderTop: '6px solid transparent',
+          border: `${Math.max(4, Math.floor(size / 10))}px solid #ffc107`,
+          borderTop: `${Math.max(4, Math.floor(size / 10))}px solid transparent`,
         }}
       />
     </div>

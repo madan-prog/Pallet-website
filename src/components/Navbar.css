@@ -6,9 +6,10 @@
   width: 100%;
   background-color: #151c26 !important; /* solid dark */
   border: none;
-  padding: 20px;
+  padding: 20px; /* original padding, keep as before */
   margin: 0;
   transition: all 0.3s ease;
+  min-height: unset; /* ensure no min-height is set by enhancements */
 }
 
 /* Logo styling */
@@ -93,4 +94,362 @@
 .navbar-dark .navbar-toggler-icon,
 .navbar-light .navbar-toggler-icon {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,0.8%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Glassmorphism effect for navbar */
+.glass-navbar {
+  background: rgba(21, 28, 38, 0.85) !important;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid rgba(255,255,255,0.07);
+  padding: 0; /* prevent extra padding from glass-navbar */
+}
+
+/* Tagline under brand: keep it compact */
+.navbar-tagline {
+  font-size: 0.95rem;
+  color: #bdbdbd;
+  letter-spacing: 0.5px;
+  margin-left: 2px;
+  margin-top: 2px;
+  text-shadow: 0 1px 4px #0003;
+  line-height: 1.1;
+}
+
+/* Brand/logo hover effect */
+.logo-animate:hover {
+  text-shadow: 0 2px 16px #FFD60099, 0 1px 4px #0005;
+  transform: scale(1.03) translateY(-2px);
+  transition: all 0.2s cubic-bezier(.4,2,.6,1.2);
+}
+
+/* Divider style for nav */
+.navbar-nav .nav-item .navbar-divider {
+  width: 2px;
+  height: 32px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  margin: 0 10px;
+}
+
+/* Ensure enhanced elements do not increase navbar height */
+.navbar .navbar-brand {
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar .avatar-enhanced {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7b4397, #dc2430);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.25rem;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.22s cubic-bezier(.4,2,.6,1.2), box-shadow 0.22s, border-color 0.22s;
+}
+
+.navbar .avatar-enhanced:hover {
+  transform: scale(1.13);
+  box-shadow: 0 4px 18px 0 rgba(123,67,151,0.18), 0 0 0 4px rgba(255,255,255,0.18);
+  border-color: #ffd600;
+  cursor: pointer;
+}
+
+/* --- Enhanced User Info Dropdown Card --- */
+.navbar .user-info-dropdown-card {
+  background: linear-gradient(135deg, #23272f 80%, #2d2f36 100%);
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(0,0,0,0.22);
+  border: 1.5px solid #333a4d;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  min-width: 240px;
+  color: #fff;
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-right: 0.2rem;
+}
+
+.navbar .user-info-dropdown-card .user-name {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.navbar .user-info-dropdown-card .user-email {
+  color: #ffd600;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.1rem;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar .user-info-dropdown-card .info-btn, 
+.navbar .user-info-dropdown-card .logout-btn {
+  width: 100%;
+  padding: 0.7rem 0;
+  border-radius: 9px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.navbar .user-info-dropdown-card .info-btn {
+  background: transparent;
+  color: #ffd600;
+  border: 2px solid #ffd600;
+  margin-bottom: 1rem;
+}
+
+.navbar .user-info-dropdown-card .info-btn:hover {
+  background: #fff;
+  color: #23272f;
+  box-shadow: 0 2px 8px rgba(255,214,0,0.15);
+}
+
+.navbar .user-info-dropdown-card .logout-btn {
+  background: #ffd600;
+  color: #23272f;
+  border: none;
+  margin-bottom: 0;
+}
+
+.navbar .user-info-dropdown-card .logout-btn:hover {
+  background: #ffd600;
+  color: #23272f;
+  box-shadow: 0 2px 8px rgba(255,214,0,0.15);
+}
+
+/* --- Enhanced Attractive Quote Table --- */
+.quote-section-card {
+  background: rgba(30, 34, 44, 0.85);
+  border-radius: 26px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  padding: 2.7rem 2.2rem 2.4rem 2.2rem;
+  margin: 2rem auto 2.5rem auto;
+  max-width: 99vw;
+  border: 1.5px solid #23272f;
+  backdrop-filter: blur(8px);
+}
+
+/* --- Simple & Attractive Table Header --- */
+.quotes-table-enhanced th {
+  background: linear-gradient(90deg, #23272f 80%, #3a2f00 100%);
+  color: #ffd600;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  border-bottom: 2.5px solid #ffe066;
+  border-right: 1px solid #44413a;
+  border-left: 1px solid #44413a;
+  border-top: none;
+  padding: 14px 22px;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 0;
+  box-shadow: 0 2px 12px #ffd60022 inset;
+  text-shadow: 0 0 6px #ffd60055, 0 1px 4px #0005;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.quotes-table-enhanced th:first-child {
+  border-top-left-radius: 14px;
+  border-left: none;
+}
+
+.quotes-table-enhanced th:last-child {
+  border-top-right-radius: 14px;
+  border-right: none;
+}
+
+.quotes-table-enhanced tr {
+  background: transparent;
+}
+
+.quotes-table-enhanced {
+  border-radius: 14px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+}
+
+.quotes-table-enhanced td {
+  background: rgba(35,41,58,0.85) !important;
+  color: #f3f3f3 !important;
+  font-size: 1.01rem !important;
+  font-weight: 500 !important;
+  border-bottom: 1.5px solid #23272f !important;
+  padding: 13px 22px !important;
+  transition: background 0.15s, color 0.15s;
+}
+
+.quotes-table-enhanced tbody tr {
+  border-bottom: 1.5px solid #23272f !important;
+  box-shadow: 0 1px 0 #23272f;
+}
+
+.quotes-table-enhanced tbody tr:hover td {
+  background: #23293a !important;
+  color: #ffd600 !important;
+}
+
+.quotes-table-enhanced tbody tr + tr td {
+  border-top: 1px solid #23293a33;
+}
+
+.status-badge-enhanced {
+  padding: 0 7px;
+  font-size: 0.72rem;
+  border-radius: 4px;
+  min-width: 0;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.status-badge-enhanced svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* --- Card-based Quotes UI --- */
+.quotes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.quote-card {
+  background: rgba(35, 43, 57, 0.85);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  border: 1.5px solid #23272f;
+  padding: 2rem 1.5rem 1.2rem 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.18s, border-color 0.18s;
+}
+
+.quote-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.quote-id {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FFD600;
+  letter-spacing: 0.5px;
+}
+
+.quote-status {
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 1em;
+  padding: 0.3em 1em;
+  background: #232a37;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.status-approved .quote-status { background: #22c55e; color: #fff; }
+.status-pending .quote-status { background: #FFD600; color: #232a37; }
+.status-rejected .quote-status { background: #ef4444; color: #fff; }
+
+.quote-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5em 1.5em;
+  font-size: 1.05rem;
+  margin-bottom: 1.2rem;
+}
+
+.quote-card-actions {
+  display: flex;
+  gap: 0.7em;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  border: none;
+  border-radius: 50%;
+  width: 2.3em;
+  height: 2.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  background: #232a37;
+  color: #FFD600;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.18s, color 0.18s;
+  cursor: pointer;
+}
+
+.action-btn.approve {
+  background: #22c55e;
+  color: #fff;
+}
+.action-btn.approve:hover {
+  background: #16a34a;
+}
+.action-btn.reject {
+  background: #FFD600;
+  color: #232a37;
+}
+.action-btn.reject:hover {
+  background: #ffe066;
+}
+.action-btn.delete {
+  background: #23272f;
+  color: #ff4d4f;
+  border: 1.5px solid #ff4d4f;
+}
+.action-btn.delete:hover {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* Remove colored card backgrounds for statuses */
+.status-approved.quote-card,
+.status-pending.quote-card {
+  background: rgba(35, 43, 57, 0.85);
+  border: 1.5px solid #23272f;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+}
+.status-approved .quote-id, .status-pending .quote-id {
+  color: #FFD600;
+}
+.status-approved .quote-status {
+  background: #22c55e;
+  color: #fff;
+}
+.status-pending .quote-status {
+  background: #FFD600;
+  color: #232a37;
 }

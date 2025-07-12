@@ -4,6 +4,8 @@ import { Play, RotateCcw, Settings, Download, Eye, Maximize } from 'lucide-react
 import toast from 'react-hot-toast';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { api } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Simulator = () => {
   const [isSimulating, setIsSimulating] = useState(false);
@@ -14,14 +16,16 @@ const Simulator = () => {
     loadType: 'boxes',
     loadWeight: 1000,
     environment: 'warehouse',
-    duration: 30,
     forkliftType: 'standard'
   });
   const [isPalletPaused, setIsPalletPaused] = useState(false);
+  const [adminSettings, setAdminSettings] = useState(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   // Add refs for the two range sliders
   const loadWeightRef = useRef(null);
-  const durationRef = useRef(null);
+
+  const { user } = useAuth();
 
   // Helper to set the --range-progress CSS variable for a range input
   const setRangeFill = (input, value, min, max) => {
@@ -33,8 +37,27 @@ const Simulator = () => {
   // Update fill on mount and when values change
   useEffect(() => {
     setRangeFill(loadWeightRef.current, settings.loadWeight, 100, 3000);
-    setRangeFill(durationRef.current, settings.duration, 10, 120);
-  }, [settings.loadWeight, settings.duration]);
+  }, [settings.loadWeight]);
+
+  useEffect(() => {
+    if (!user || !user.roles || !user.roles.includes('ROLE_ADMIN')) {
+      setAdminSettings(null);
+      setSettingsLoading(false);
+      return;
+    }
+    api.get('/api/admin/settings')
+      .then(res => setAdminSettings(res.data))
+      .catch(err => {
+        if (err.response && err.response.status === 403) {
+          setAdminSettings(null);
+          toast.error('You do not have permission to access admin settings');
+        } else {
+          setAdminSettings(null);
+          toast.error('Failed to load pricing settings');
+        }
+      })
+      .finally(() => setSettingsLoading(false));
+  }, [user]);
 
   const palletTypes = [
     { value: 'euro', label: 'Euro Pallet (1200×800mm)' },
@@ -88,12 +111,47 @@ const Simulator = () => {
   };
 
   const generateResults = () => {
+    // Determine base lifespan by pallet type
+    let baseMin, baseMax;
+    if (settings.palletType === 'euro' || settings.palletType === 'block' || settings.palletType === 'heavy-duty') {
+      // Block/Euro/Heavy Duty Pallets
+      baseMin = 8; baseMax = 20;
+    } else if (settings.palletType === 'standard' || settings.palletType === 'stringer') {
+      // Stringer/Standard Pallets
+      baseMin = 3; baseMax = 10;
+    } else {
+      // Custom or unknown
+      baseMin = 5; baseMax = 15;
+    }
+
+    // Adjust for load weight (heavier = fewer cycles)
+    let loadFactor = 1;
+    if (settings.loadWeight > 2000) loadFactor = 0.7;
+    else if (settings.loadWeight > 1200) loadFactor = 0.85;
+    else if (settings.loadWeight < 600) loadFactor = 1.15;
+
+    // Adjust for environment (bad = fewer cycles)
+    let envFactor = 1;
+    if (settings.environment === 'outdoor' || settings.environment === 'humid' || settings.environment === 'cold') envFactor = 0.8;
+    else if (settings.environment === 'warehouse') envFactor = 1.1;
+
+    // Adjust for handling (pallet jack = best, standard = ok, others = rougher)
+    let handlingFactor = 1;
+    if (settings.forkliftType === 'pallet-jack') handlingFactor = 1.1;
+    else if (settings.forkliftType === 'reach' || settings.forkliftType === 'order-picker') handlingFactor = 0.9;
+
+    // Calculate estimated lifespan
+    let cycles = Math.round(
+      (Math.random() * (baseMax - baseMin) + baseMin) * loadFactor * envFactor * handlingFactor
+    );
+    if (cycles < 1) cycles = 1;
+
     const results = {
       structuralIntegrity: Math.random() * 20 + 80, // 80-100%
       loadDistribution: Math.random() * 15 + 85, // 85-100%
       durabilityScore: Math.random() * 25 + 75, // 75-100%
       safetyRating: Math.random() * 10 + 90, // 90-100%
-      estimatedLifespan: Math.floor(Math.random() * 500 + 1000), // 1000-1500 cycles
+      estimatedLifespan: cycles, // realistic cycles
       recommendations: [
         'Pallet performs well under specified load conditions',
         'Consider reinforcement for loads exceeding 1200kg',
@@ -141,6 +199,48 @@ const Simulator = () => {
     toast.success('Results exported successfully!');
   };
 
+  const getPriceComponents = () => {
+    if (!adminSettings) return null;
+    const quantity = 1; // For simulation, assume 1 pallet unless you want to add a quantity input
+    const palletType = settings.palletType;
+    // Base cost per pallet type
+    let basePrice = adminSettings.basePalletCost?.[palletType] || 0;
+    // Material surcharge (simulate with 'wood' for now, or add material selection)
+    const material = 'wood';
+    const materialSurcharge = (adminSettings.materialSurcharge?.[material] || 0) * quantity;
+    // Urgency fee (simulate with 'normal' for now, or add urgency selection)
+    const urgency = 'normal';
+    const urgencyFees = (adminSettings.urgencyFee?.[urgency] || 0) * quantity;
+    // If quantity < minimum, increase price per pallet
+    if (quantity < (adminSettings.minimumOrderQuantity || 1)) {
+      basePrice *= 1 + (adminSettings.priceIncreasePercentBelowMinimum || 0) / 100;
+    }
+    const baseCost = basePrice * quantity;
+    const subtotal = baseCost + materialSurcharge + urgencyFees;
+    let shipping = 0;
+    if (adminSettings.shippingPerPallet) {
+      shipping = (adminSettings.shippingEstimate || 0) * quantity;
+    } else {
+      shipping = adminSettings.shippingEstimate || 0;
+    }
+    const totalBeforeGst = subtotal + shipping;
+    const cgst = totalBeforeGst * ((adminSettings.cgstPercent || 0) / 100);
+    const sgst = totalBeforeGst * ((adminSettings.sgstPercent || 0) / 100);
+    const total = totalBeforeGst + cgst + sgst;
+    return {
+      baseCost: Math.round(baseCost),
+      materialSurcharge: Math.round(materialSurcharge),
+      urgencyFees: Math.round(urgencyFees),
+      subtotal: Math.round(subtotal),
+      shipping: Math.round(shipping),
+      totalBeforeGst: Math.round(totalBeforeGst),
+      cgst: Math.round(cgst),
+      sgst: Math.round(sgst),
+      total: Math.round(total),
+    };
+  };
+  const priceComponents = getPriceComponents();
+
   // Add a RotatingPallet component to wrap the pallet meshes
   function RotatingPallet({ children, paused }) {
     const group = useRef();
@@ -153,18 +253,18 @@ const Simulator = () => {
   }
 
   return (
-    <div className="simulator-page min-vh-100 pt-5 pb-4 bg-dark">
-      <div className="container py-4">
+    <div className="simulator-page min-vh-100 bg-dark" style={{ paddingTop: '150px', paddingBottom: '3rem' }}>
+      <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-4"
+          className="text-center mb-5"
         >
-          <h1 className="display-4 mb-2">
+          <h1 className="display-4 fw-bold mb-3">
             <span className="text-warning">3D</span> Simulator
           </h1>
-          <p className="lead text-light mx-auto" style={{ maxWidth: 700 }}>
+          <p className="fs-5 text-light mx-auto" style={{ maxWidth: '800px' }}>
             Advanced pallet performance simulation with real-time stress analysis and load testing
           </p>
         </motion.div>
@@ -250,26 +350,6 @@ const Simulator = () => {
                       </option>
                     ))}
                   </select>
-                </div>
-
-                {/* Simulation Duration */}
-                <div className="mb-3">
-                  <label className="form-label">
-                    Duration: {settings.duration} seconds
-                  </label>
-                  <input
-                    type="range"
-                    min="10"
-                    max="120"
-                    value={settings.duration}
-                    onChange={(e) => setSettings(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
-                    className="form-range"
-                    ref={durationRef}
-                  />
-                  <div className="d-flex justify-content-between text-secondary small mt-1">
-                    <span>10s</span>
-                    <span>120s</span>
-                  </div>
                 </div>
 
                 {/* Forklift Type */}

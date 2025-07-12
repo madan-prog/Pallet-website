@@ -1,0 +1,7 @@
+.resend-otp-btn:hover {
+  color: #22c55e !important; /* Brighter green */
+  text-decoration: underline wavy;
+  cursor: pointer;
+  opacity: 0.92;
+  letter-spacing: 0.5px;
+} 

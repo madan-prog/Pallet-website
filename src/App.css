@@ -346,3 +346,60 @@ html, body, #root {
 }
 
 /* JS to update the --value variable for Chrome/Edge/Safari */
+
+/* Advanced Tools Section */
+.advanced-tools-section {
+  background-color: #1a1a1a;
+}
+
+.tool-card {
+  background-color: #242424;
+  border: 1px solid #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Stats Section */
+.stats-section {
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.stats-section .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* CTA Section */
+.cta-section .btn-outline-dark {
+  border-color: #212529;
+}
+.cta-section .btn-outline-dark:hover,
+.cta-section .btn-outline-dark:active {
+  background-color: #212529;
+  color: #ffc107;
+}
+
+/* Ensure both cards have equal height */
+.simulator-page .equal-height-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+.simulator-page .equal-height-cards > div[class*='col-'] {
+  display: flex;
+  flex-direction: column;
+}
+.simulator-page .equal-height-cards .card {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 900px;
+}
+
+/* Ensure row uses align-items-stretch for full height alignment */
+.simulator-page .row.flex-nowrap {
+  align-items: stretch !important;
+}

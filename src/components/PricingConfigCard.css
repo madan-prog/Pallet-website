@@ -1,0 +1,136 @@
+/* PricingConfigCard.css */
+
+.pricing-card-container {
+  background: #23272f;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.18), 0 1.5px 4px rgba(0,0,0,0.12);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  color: #f5f6fa;
+  position: relative;
+}
+
+.pricing-card-container h5 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+  color: #ffd166;
+  text-align: center;
+}
+
+.pricing-card-container h6 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #8ecae6;
+}
+
+.pricing-card-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1.5px solid #31343b;
+}
+
+.pricing-card-container label {
+  color: #adb5bd;
+  font-weight: 500;
+}
+
+.pricing-card-container input,
+.pricing-card-container .form-control {
+  background: #23272f;
+  border: 1.5px solid #31343b;
+  color: #f5f6fa;
+  border-radius: 8px;
+  transition: border 0.2s;
+}
+
+.pricing-card-container input:focus,
+.pricing-card-container .form-control:focus {
+  border: 1.5px solid #ffd166;
+  outline: none;
+  background: #23272f;
+  color: #fff;
+}
+
+.pricing-card-container table {
+  background: #23272f;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-card-container th,
+.pricing-card-container td {
+  background: #23272f;
+  color: #f5f6fa;
+  border-color: #31343b;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.pricing-card-container .btn {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.pricing-card-container .btn-primary {
+  background: linear-gradient(90deg, #ffd166 0%, #fcb900 100%);
+  color: #23272f;
+  border: none;
+}
+
+.pricing-card-container .btn-primary:hover {
+  background: linear-gradient(90deg, #fcb900 0%, #ffd166 100%);
+  color: #23272f;
+}
+
+.pricing-card-container .btn-outline-success {
+  border: 1.5px solid #06d6a0;
+  color: #06d6a0;
+  background: transparent;
+}
+
+.pricing-card-container .btn-outline-success:hover {
+  background: #06d6a0;
+  color: #23272f;
+}
+
+.pricing-card-container .btn-outline-danger {
+  border: 1.5px solid #ef476f;
+  color: #ef476f;
+  background: transparent;
+}
+
+.pricing-card-container .btn-outline-danger:hover {
+  background: #ef476f;
+  color: #fff;
+}
+
+.pricing-card-container .btn-outline-secondary {
+  border: 1.5px solid #adb5bd;
+  color: #adb5bd;
+  background: transparent;
+}
+
+.pricing-card-container .btn-outline-secondary:hover {
+  background: #adb5bd;
+  color: #23272f;
+}
+
+.pricing-card-container .alert {
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .pricing-card-container {
+    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+  }
+} 

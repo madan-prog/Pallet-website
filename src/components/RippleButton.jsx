@@ -1,5 +1,5 @@
 import React from 'react';
-import './RippleButton.css'; // Step 2: create this CSS
+import './RippleButton.css';
 
 const RippleButton = ({ children, className = '', onClick, ...props }) => {
   const handleClick = (e) => {

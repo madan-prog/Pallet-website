@@ -1,11 +1,16 @@
-import { useState, Suspense, useRef } from 'react';
+import { useState, Suspense, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Ruler, Package, Save, Download, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 import './PalletBuilder.css';
+import { useForm, Controller } from 'react-hook-form';
+import { ThreeDViewer } from './ThreeDViewer';
+import { Box, Layers, Move, Type } from 'lucide-react';
+import { api } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
 
 const Pallet = ({ specs }) => {
   const { length, width, height, deckBoards, stringers, material } = specs;
@@ -14,14 +19,14 @@ const Pallet = ({ specs }) => {
   // Realistic, distinct wood colors for each part
   const colorSets = {
     pine: {
-      top: '#e3c08d',
-      block: '#b88a5a',
-      bottom: '#a97c50',
+      top: '#f7e7c2',      // lighter, creamy beige
+      block: '#e2b97f',    // warm, soft brown
+      bottom: '#cfa96a',   // slightly richer brown
     },
-    oak: {
-      top: '#c9a063',
-      block: '#a97c50',
-      bottom: '#7c5a36',
+    ply: {
+      top: '#e7c48a',    // light golden beige
+      block: '#d6ad6b',  // warm tan
+      bottom: '#b88a4a', // medium golden brown
     },
     birch: {
       top: '#f5e6c8',
@@ -129,13 +134,15 @@ const RotatingPallet = ({ children, isPaused }) => {
   return <group ref={groupRef}>{children}</group>;
 };
 
-const Builder = () => {
+const PalletBuilder = () => {
+  const { user } = useAuth();
+  const { settings: adminSettings, loading: settingsLoading } = useSettings();
   const [specs, setSpecs] = useState({
-    length: 1200,
-    width: 800,
-    height: 150,
+    length: 1200, // mm
+    width: 800,   // mm
+    height: 150,  // mm
     deckBoards: 7,
-    stringers: 3, // Note: The visual model is Euro-style (blocks), but this can be kept for price calculation
+    stringers: 3,
     material: 'pine',
     loadCapacity: 1000
   });
@@ -145,18 +152,68 @@ const Builder = () => {
 
   const materials = [
     { value: 'pine', label: 'Pine Wood', price: 1.2 },
-    { value: 'oak', label: 'Oak Wood', price: 2.1 },
+    { value: 'ply', label: 'Ply Wood', price: 1.3 },
     { value: 'birch', label: 'Birch Wood', price: 1.8 },
     { value: 'recycled', label: 'Recycled Wood', price: 0.9 }
   ];
 
-  const calculatePrice = () => {
-    const materialMultiplier = materials.find(m => m.value === specs.material)?.price || 1;
-    const basePrice = (specs.length * specs.width * specs.height) / 1000000 * 50;
-    const boardsPrice = specs.deckBoards * 15;
-    const stringersPrice = specs.stringers * 25; // Calculation can still use stringers
-    return Math.round((basePrice + boardsPrice + stringersPrice) * materialMultiplier);
+  const getPriceComponents = () => {
+    if (!adminSettings) {
+      return {
+        baseCost: 0,
+        materialSurcharge: 0,
+        urgencyFees: 0,
+        subtotal: 0,
+        shipping: 0,
+        cgst: 0,
+        sgst: 0,
+        total: 0,
+        totalBeforeGst: 0,
+      };
+    }
+    const quantity = 1; // For builder, assume 1 pallet
+    const palletType = 'standard'; // You may want to let user pick type
+    const material = specs.material;
+    const urgency = 'standard'; // You may want to let user pick urgency
+    // Base cost per pallet type
+    let basePrice = adminSettings.basePalletCost?.[palletType] || 0;
+    // If quantity < minimum, increase price per pallet
+    if (quantity < (adminSettings.minimumOrderQuantity || 1)) {
+      basePrice *= 1 + (adminSettings.priceIncreasePercentBelowMinimum || 0) / 100;
+    }
+    // Material surcharge
+    const materialSurcharge = (adminSettings.materialSurcharge?.[material] || 0) * quantity;
+    // Urgency fee
+    const urgencyFees = (adminSettings.urgencyFee?.[urgency] || 0) * quantity;
+    // Base cost
+    const baseCost = basePrice * quantity;
+    // Subtotal
+    const subtotal = baseCost + materialSurcharge + urgencyFees;
+    // Shipping
+    let shipping = 0;
+    if (adminSettings.shippingPerPallet) {
+      shipping = (adminSettings.shippingEstimate || 0) * quantity;
+    } else {
+      shipping = adminSettings.shippingEstimate || 0;
+    }
+    const totalBeforeGst = subtotal + shipping;
+    const cgst = totalBeforeGst * ((adminSettings.cgstPercent || 0) / 100);
+    const sgst = totalBeforeGst * ((adminSettings.sgstPercent || 0) / 100);
+    const total = totalBeforeGst + cgst + sgst;
+    return {
+      baseCost: Math.round(baseCost),
+      materialSurcharge: Math.round(materialSurcharge),
+      urgencyFees: Math.round(urgencyFees),
+      subtotal: Math.round(subtotal),
+      shipping: Math.round(shipping),
+      totalBeforeGst: Math.round(totalBeforeGst),
+      cgst: Math.round(cgst),
+      sgst: Math.round(sgst),
+      total: Math.round(total),
+    };
   };
+
+  const priceComponents = getPriceComponents();
 
   const handleSpecChange = (key, value) => {
     setSpecs(prev => ({ ...prev, [key]: value }));
@@ -183,7 +240,7 @@ const Builder = () => {
   const exportDesign = () => {
     const designData = {
       ...specs,
-      estimatedPrice: calculatePrice(),
+      estimatedPrice: priceComponents.total,
       timestamp: new Date().toISOString()
     };
     
@@ -199,8 +256,10 @@ const Builder = () => {
     toast.success('Design exported successfully!');
   };
 
+  if (settingsLoading) return <div style={{ color: 'white', padding: '2rem' }}>Loading pricing settings...</div>;
+
   return (
-    <div className="min-vh-100 pb-4 builder-bg" style={{ paddingTop: '100px' }}>
+    <div className="min-vh-100 simulator-page bg-dark text-light" style={{ paddingTop: '150px', paddingBottom: '3rem' }}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -235,7 +294,7 @@ const Builder = () => {
                 <div>
                   <h3 className="h6 fw-semibold mb-3 text-warning">Dimensions (mm)</h3>
                   <div className="row g-3">
-                    <div className="col-6">
+                    <div className="col-4">
                       <label className="form-label small">Length</label>
                       <input
                         type="number"
@@ -247,7 +306,7 @@ const Builder = () => {
                         step="50"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-4">
                       <label className="form-label small">Width</label>
                       <input
                         type="number"
@@ -259,7 +318,7 @@ const Builder = () => {
                         step="50"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-4">
                       <label className="form-label small">Height</label>
                       <input
                         type="number"
@@ -329,16 +388,6 @@ const Builder = () => {
                       </option>
                     ))}
                   </select>
-                </div>
-
-                {/* Price Display */}
-                <div className="price-box rounded p-3">
-                  <div className="text-center">
-                    <div className="small text-white-50 mb-1">Estimated Price</div>
-                    <div className="h3 fw-bold text-warning">
-                      ₹{calculatePrice().toLocaleString()}
-                    </div>
-                  </div>
                 </div>
 
                 {/* Action Buttons */}
@@ -488,9 +537,6 @@ const Builder = () => {
                     <div className="small text-white-50 d-flex flex-column gap-1">
                       <div>{design.length} × {design.width} × {design.height} mm</div>
                       <div className="text-capitalize">{design.material} wood</div>
-                      <div className="text-warning fw-semibold">
-                        ₹{Math.round((design.length * design.width * design.height) / 1000000 * 50 * (materials.find(m => m.value === design.material)?.price || 1)).toLocaleString()}
-                      </div>
                     </div>
                     <button
                       onClick={() => setSpecs(design)}
@@ -509,4 +555,4 @@ const Builder = () => {
   );
 };
 
-export default Builder;
+export default PalletBuilder;

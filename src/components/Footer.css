@@ -25,3 +25,13 @@ footer .text-muted {
   text-align: center;
   margin-top: 1rem;
 }
+
+.footer-social-icon {
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+.footer-social-icon:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px #0005;
+  background: #2d3748;
+  color: #fff !important;
+}
