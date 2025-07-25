@@ -15,8 +15,13 @@ import {
   Mail,
   Building,
   MapPin,
-  Home
+  Home,
+  Star,
+  Award,
+  Package
 } from 'lucide-react';
+
+// Remove tag helpers and Special Taggings UI
 
 const MyInfo = ({ isOpen, onClose, onComplete }) => {
   const { user } = useAuth();
@@ -48,13 +53,21 @@ const MyInfo = ({ isOpen, onClose, onComplete }) => {
     if (isOpen) setIsEditing(false);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen && userInfo === null) {
+      setIsEditing(true);
+    }
+  }, [isOpen, userInfo]);
+
   const fetchUserInfo = async () => {
     try {
       const response = await api.get(`/user-info/${user.email}`);
       const data = response.data;
       setUserInfo(data);
-      setIsComplete(true);
-      if (onComplete) onComplete(true);
+      // Always check completeness from backend
+      const existsResponse = await api.get(`/user-info/${user.email}/exists`);
+      setIsComplete(!!existsResponse.data.exists);
+      // Do NOT call onComplete here; only update UI
       reset({
         fullName: data.fullName || user.fullName || '',
         email: data.email || user.email || '',
@@ -75,8 +88,9 @@ const MyInfo = ({ isOpen, onClose, onComplete }) => {
           state: '',
           pincode: ''
         });
+        setUserInfo(null);
         setIsComplete(false);
-        if (onComplete) onComplete(false);
+        // Do NOT call onComplete here
       } else {
         toast.error('Failed to load profile information');
       }
@@ -98,9 +112,14 @@ const MyInfo = ({ isOpen, onClose, onComplete }) => {
         response = await api.post('/user-info', userInfoData);
       }
       setUserInfo(response.data);
-      setIsComplete(true);
+      // After save, check completeness from backend
+      const existsResponse = await api.get(`/user-info/${user.email}/exists`);
+      setIsComplete(!!existsResponse.data.exists);
       setIsEditing(false);
-      if (onComplete) onComplete(true);
+      if (onComplete && !!existsResponse.data.exists) {
+        onComplete(true);
+        handleClose();
+      }
       toast.success('Profile updated successfully!');
     } catch (error) {
       toast.error(error.response?.data || 'Failed to save profile information');
@@ -155,6 +174,7 @@ const MyInfo = ({ isOpen, onClose, onComplete }) => {
             </button>
           </div>
           <div className="modal-body pt-0">
+            {/* Special Taggings UI removed */}
             {!isComplete && !isEditing && (
               <div
                 className="alert alert-warning d-flex align-items-center gap-2 mb-4 myinfo-warning"

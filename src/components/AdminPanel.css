@@ -289,3 +289,128 @@ label[style*='color: #23293a'] {
   align-items: center;
   justify-content: center;
 } 
+
+.customer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  padding: 0.5rem;
+}
+.customer-card {
+  background: linear-gradient(135deg, #fffbe6 0%, #f7f7fa 100%);
+  border: 1.5px solid #ffe082;
+  border-radius: 1.2rem;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 8px 32px rgba(255, 193, 7, 0.08), 0 2px 8px #0001;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  position: relative;
+  overflow: hidden;
+  color: #23293a;
+}
+.customer-card:hover {
+  transform: translateY(-7px) scale(1.012);
+  box-shadow: 0 16px 48px #ffc10733, 0 4px 16px #0002;
+  border-color: #ffc107;
+}
+.customer-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.customer-name {
+  font-size: 1.18rem;
+  color: #23293a;
+  font-weight: 700;
+}
+.customer-company {
+  font-size: 0.97rem;
+  color: #6c757d;
+}
+.customer-badge {
+  background: #ffe082;
+  color: #23293a;
+  font-size: 0.93rem;
+  padding: 5px 14px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px #ffc10722;
+  border: 1px solid #ffe082;
+}
+.customer-contact {
+  font-size: 1rem;
+  color: #23293a;
+}
+.customer-email, .customer-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #23293a;
+}
+.customer-phone {
+  color: #6c757d;
+}
+.customer-activity {
+  font-size: 1rem;
+  color: #23293a;
+}
+.customer-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 1.13rem;
+}
+.customer-status {
+  text-align: center;
+}
+.customer-status .badge {
+  background: #22c55e22;
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 1.01rem;
+  border-radius: 8px;
+  padding: 7px 18px;
+  border: 1.5px solid #22c55e;
+}
+.customer-status .bg-warning {
+  background: #ffe082 !important;
+  color: #23293a !important;
+  border: 1.5px solid #ffc107 !important;
+}
+.customer-actions {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.customer-card .btn {
+  font-size: 1.01rem;
+  border-radius: 7px;
+  font-weight: 500;
+  padding: 6px 13px;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.13s;
+}
+.customer-card .btn:hover {
+  box-shadow: 0 2px 8px #ffc10733;
+  transform: translateY(-2px) scale(1.04);
+}
+@media (max-width: 900px) {
+  .customer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .customer-card {
+    padding: 1.1rem 0.7rem 0.9rem 0.7rem;
+  }
+} 
+
+/* Removed special tag and tag-section CSS */ 

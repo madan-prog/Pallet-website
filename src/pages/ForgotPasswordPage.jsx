@@ -8,24 +8,30 @@ const ForgotPasswordPage = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState('');
+  const [forgotMessageType, setForgotMessageType] = useState(''); // '', 'success', 'warning', 'error'
   const [isFocused, setIsFocused] = useState(false);
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
     setForgotMessage('');
+    setForgotMessageType('');
     try {
       const response = await api.post('/auth/forgot-password', { email: forgotEmail });
       if (response.data.success) {
         toast.success('If the email is registered, a reset link has been sent.');
         setForgotMessage('Password reset instructions sent to your email.');
+        setForgotMessageType('success');
       } else {
         toast.error(response.data.message || 'Failed to send reset instructions.');
         setForgotMessage(response.data.message || 'Failed to send reset instructions.');
+        setForgotMessageType('warning');
       }
     } catch (error) {
-      toast.error('Failed to send reset instructions.');
-      setForgotMessage('Failed to send reset instructions.');
+      const msg = error.response?.data?.message || 'Failed to send reset instructions.';
+      setForgotMessage(msg);
+      setForgotMessageType(msg.includes('registered email') ? 'warning' : 'error');
+      toast.error(msg);
     }
     setForgotLoading(false);
   };
@@ -117,7 +123,7 @@ const ForgotPasswordPage = () => {
               animation: 'fadeIn 0.7s',
             }}>
               <div style={{
-                background: '#22c55e22',
+                background: forgotMessageType === 'success' ? '#22c55e22' : forgotMessageType === 'warning' ? '#ffe06644' : '#ef444422',
                 borderRadius: '50%',
                 width: 38,
                 height: 38,
@@ -125,18 +131,20 @@ const ForgotPasswordPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 6,
-                boxShadow: '0 2px 8px #22c55e33',
+                boxShadow: forgotMessageType === 'success' ? '0 2px 8px #22c55e33' : forgotMessageType === 'warning' ? '0 2px 8px #ffe06644' : '0 2px 8px #ef444433',
               }}>
-                <FaCheckCircle size={22} color="#22c55e" />
+                {forgotMessageType === 'success' && <FaCheckCircle size={22} color="#22c55e" />}
+                {forgotMessageType === 'warning' && <FaExclamationCircle size={22} color="#FFD600" />}
+                {forgotMessageType === 'error' && <FaExclamationCircle size={22} color="#ef4444" />}
               </div>
               <div style={{
-                background: '#1a2a1a',
-                color: '#22c55e',
+                background: forgotMessageType === 'success' ? '#1a2a1a' : forgotMessageType === 'warning' ? '#2d2a1a' : '#2a1a1a',
+                color: forgotMessageType === 'success' ? '#22c55e' : forgotMessageType === 'warning' ? '#FFD600' : '#ef4444',
                 fontWeight: 600,
                 fontSize: '1.13rem',
                 borderRadius: 18,
                 padding: '8px 22px',
-                boxShadow: '0 2px 12px #22c55e11',
+                boxShadow: forgotMessageType === 'success' ? '0 2px 12px #22c55e11' : forgotMessageType === 'warning' ? '0 2px 12px #ffe06622' : '0 2px 12px #ef444411',
                 textAlign: 'center',
                 letterSpacing: '0.01em',
                 maxWidth: 320,

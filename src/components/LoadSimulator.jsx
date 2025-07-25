@@ -45,7 +45,7 @@ const Simulator = () => {
       setSettingsLoading(false);
       return;
     }
-    api.get('/api/admin/settings')
+    api.get('/admin/settings')
       .then(res => setAdminSettings(res.data))
       .catch(err => {
         if (err.response && err.response.status === 403) {

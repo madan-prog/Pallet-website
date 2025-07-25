@@ -67,6 +67,8 @@ const SettingsForm = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
+
+
   const handleChange = (field, value) => {
     setSettings(prev => ({ ...prev, [field]: value === '' ? '' : value }));
   };
@@ -74,6 +76,8 @@ const SettingsForm = () => {
   const handleNestedChange = (field, key, value) => {
     setSettings(prev => ({ ...prev, [field]: { ...prev[field], [key]: value } }));
   };
+
+
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -150,6 +154,58 @@ const SettingsForm = () => {
               min={0}
               value={settings.priceIncreasePercentBelowMinimum}
               onChange={e => handleChange('priceIncreasePercentBelowMinimum', parseFloat(e.target.value) || 0)}
+              readOnly={!isEditing}
+            />
+          </div>
+        </div>
+        <div className="row g-3 mb-2 align-items-center">
+          <div className="col-6">
+            <label className="form-label fw-semibold" style={{ color: '#e0e6ed' }}>VIP Discount (%)</label>
+            <input
+              type="number"
+              className="form-control bg-dark border-secondary rounded-3"
+              min={0}
+              max={100}
+              value={settings.vipDiscountPercent ?? ''}
+              onChange={e => handleChange('vipDiscountPercent', parseFloat(e.target.value) || 0)}
+              readOnly={!isEditing}
+            />
+          </div>
+          <div className="col-6">
+            <label className="form-label fw-semibold" style={{ color: '#e0e6ed' }}>Bulk Orders Discount (%)</label>
+            <input
+              type="number"
+              className="form-control bg-dark border-secondary rounded-3"
+              min={0}
+              max={100}
+              value={settings.bulkOrdersDiscountPercent ?? ''}
+              onChange={e => handleChange('bulkOrdersDiscountPercent', parseFloat(e.target.value) || 0)}
+              readOnly={!isEditing}
+            />
+          </div>
+        </div>
+        <div className="row g-3 mb-2 align-items-center">
+          <div className="col-6">
+            <label className="form-label fw-semibold" style={{ color: '#e0e6ed' }}>Special Pricing Discount (%)</label>
+            <input
+              type="number"
+              className="form-control bg-dark border-secondary rounded-3"
+              min={0}
+              max={100}
+              value={settings.specialPricingDiscountPercent ?? ''}
+              onChange={e => handleChange('specialPricingDiscountPercent', parseFloat(e.target.value) || 0)}
+              readOnly={!isEditing}
+            />
+          </div>
+          <div className="col-6">
+            <label className="form-label fw-semibold" style={{ color: '#e0e6ed' }}>Frequent Buyer Discount (%)</label>
+            <input
+              type="number"
+              className="form-control bg-dark border-secondary rounded-3"
+              min={0}
+              max={100}
+              value={settings.frequentBuyerDiscountPercent ?? ''}
+              onChange={e => handleChange('frequentBuyerDiscountPercent', parseFloat(e.target.value) || 0)}
               readOnly={!isEditing}
             />
           </div>
@@ -234,6 +290,7 @@ const SettingsForm = () => {
             />
           </div>
         </div>
+
         <div className="col-12 text-end mt-2">
           {isEditing && (
             <div className="text-end mt-4 d-flex justify-content-end gap-2">

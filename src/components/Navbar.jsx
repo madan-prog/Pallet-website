@@ -5,6 +5,7 @@ import './Navbar.css';
 import { useAuth } from '../context/AuthContext';
 import MyInfo from './MyInfo';
 import { User, CheckCircle, AlertCircle } from 'lucide-react';
+import { api } from '../context/AuthContext';
 
 function Navbar() {
   const navbarRef = useRef();
@@ -45,6 +46,23 @@ function Navbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Function to check profile completeness from backend
+  const refreshUserInfoComplete = async () => {
+    if (!user) return;
+    try {
+      const response = await api.get(`/user-info/${user.email}/exists`);
+      setUserInfoComplete(!!response.data.exists);
+    } catch (error) {
+      setUserInfoComplete(false);
+    }
+  };
+
+  // When user logs in, check profile completeness
+  useEffect(() => {
+    refreshUserInfoComplete();
+    // eslint-disable-next-line
+  }, [user]);
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -187,9 +205,9 @@ function Navbar() {
 
       {/* MyInfo Modal */}
       <MyInfo 
-        isOpen={showMyInfo} 
+        isOpen={showMyInfo}
         onClose={() => setShowMyInfo(false)}
-        onComplete={() => setUserInfoComplete(true)}
+        onComplete={refreshUserInfoComplete}
       />
     </>
   );

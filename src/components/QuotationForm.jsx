@@ -25,6 +25,9 @@ const Quotation = () => {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
   const [submitting, setSubmitting] = useState(false);
 
+  // Add state for real-time validation warnings
+  const [dimensionWarnings, setDimensionWarnings] = useState({});
+
   useEffect(() => {
     if (user) {
       checkUserInfo();
@@ -69,6 +72,13 @@ const Quotation = () => {
     }
   };
 
+  // After userInfo is loaded, ensure tags is always an array
+  useEffect(() => {
+    if (userInfo && !Array.isArray(userInfo.tags)) {
+      setUserInfo({ ...userInfo, tags: [] });
+    }
+  }, [userInfo]);
+
   const palletTypes = [
     { value: 'standard', label: 'Standard Pallet', basePrice: 800 },
     { value: 'euro', label: 'Euro Pallet', basePrice: 950 },
@@ -94,35 +104,43 @@ const Quotation = () => {
   const getPriceComponents = () => {
     if (!adminSettings) {
       return {
-        baseCost: 0, materialSurcharge: 0, urgencyFees: 0, subtotal: 0, shipping: 0, cgst: 0, sgst: 0, total: 0, totalBeforeGst: 0,
+        baseCost: 0, materialSurcharge: 0, urgencyFees: 0, subtotal: 0, shipping: 0, cgst: 0, sgst: 0, total: 0, totalBeforeGst: 0, discount: 0,
       };
     }
     const quantity = watchedValues.quantity || 0;
     const palletType = watchedValues.palletType;
     const material = watchedValues.material;
     const urgency = watchedValues.urgency;
-    // Base cost per pallet type
     let basePrice = adminSettings.basePalletCost?.[palletType] || 0;
-    // If quantity < minimum, increase price per pallet
     if (quantity < (adminSettings.minimumOrderQuantity || 1)) {
       basePrice *= 1 + (adminSettings.priceIncreasePercentBelowMinimum || 0) / 100;
     }
-    // Material surcharge
     const materialSurcharge = (adminSettings.materialSurcharge?.[material] || 0) * quantity;
-    // Urgency fee
     const urgencyFees = (adminSettings.urgencyFee?.[urgency] || 0) * quantity;
-    // Base cost
     const baseCost = basePrice * quantity;
-    // Subtotal
     const subtotal = baseCost + materialSurcharge + urgencyFees;
-    // Shipping
     let shipping = 0;
     if (adminSettings.shippingPerPallet) {
       shipping = (adminSettings.shippingEstimate || 0) * quantity;
     } else {
       shipping = adminSettings.shippingEstimate || 0;
     }
-    const totalBeforeGst = subtotal + shipping;
+    let totalBeforeGst = subtotal + shipping;
+    // --- Discount Category Logic ---
+    let discount = 0;
+    let discountLabel = '';
+    const category = userInfo?.discountCategory;
+    if (category && adminSettings) {
+      let percent = 0;
+      if (category === 'VIP') percent = adminSettings.vipDiscountPercent || 0;
+      if (category === 'Bulk Orders') percent = adminSettings.bulkOrdersDiscountPercent || 0;
+      if (category === 'Special Pricing') percent = adminSettings.specialPricingDiscountPercent || 0;
+      if (category === 'Frequent Buyer') percent = adminSettings.frequentBuyerDiscountPercent || 0;
+      if (percent > 0) {
+        discount = Math.round(subtotal * (percent / 100));
+        discountLabel = `${category} Discount (${percent}%)`;
+      }
+    }
     const cgst = totalBeforeGst * ((adminSettings.cgstPercent || 0) / 100);
     const sgst = totalBeforeGst * ((adminSettings.sgstPercent || 0) / 100);
     const total = totalBeforeGst + cgst + sgst;
@@ -136,6 +154,8 @@ const Quotation = () => {
       cgst: Math.round(cgst),
       sgst: Math.round(sgst),
       total: Math.round(total),
+      discount: Math.round(discount),
+      discountLabel,
     };
   };
 
@@ -298,14 +318,61 @@ const Quotation = () => {
     setShowForm(true);
   };
 
-  const handleMyInfoComplete = (complete) => {
-    setUserInfoComplete(complete);
-    if (complete) {
-      checkUserInfo(); // Refresh user info data
+  const handleMyInfoComplete = () => {
+    setShowMyInfo(false); // Close the modal after completion
+    checkUserInfo().then(() => {
+      toast.success('Profile completed! You can now request a quote.');
+    });
+  };
+
+  // Add function to check dimension limits
+  const checkDimensionLimits = (name, value) => {
+    const numValue = Number(value);
+    const warnings = { ...dimensionWarnings };
+    
+    if (name === 'length') {
+      if (numValue < 600) {
+        warnings.length = 'Length too small. Minimum is 600mm.';
+      } else if (numValue > 2000) {
+        warnings.length = 'Length too large. Maximum is 2000mm.';
+      } else {
+        delete warnings.length;
+      }
+    } else if (name === 'width') {
+      if (numValue < 400) {
+        warnings.width = 'Width too small. Minimum is 400mm.';
+      } else if (numValue > 1500) {
+        warnings.width = 'Width too large. Maximum is 1500mm.';
+      } else {
+        delete warnings.width;
+      }
+    } else if (name === 'height') {
+      if (numValue < 100) {
+        warnings.height = 'Height too small. Minimum is 100mm.';
+      } else if (numValue > 300) {
+        warnings.height = 'Height too large. Maximum is 300mm.';
+      } else {
+        delete warnings.height;
+      }
     }
+    
+    setDimensionWarnings(warnings);
+  };
+
+  // Add onChange handler for dimension inputs
+  const handleDimensionChange = (e) => {
+    const { name, value } = e.target;
+    checkDimensionLimits(name, value);
   };
 
   if (settingsLoading) return <div>Loading pricing settings...</div>;
+
+  // Add debug logs at the top of the component (inside the function)
+  console.log('[DEBUG] userInfo:', userInfo);
+  console.log('[DEBUG] adminSettings:', adminSettings);
+
+  const tags = (userInfo && Array.isArray(userInfo.tags)) ? userInfo.tags : [];
+  console.log('[DEBUG] tags:', tags);
 
   return (
     <div className="container-fluid simulator-page" style={{ paddingTop: '100px', minHeight: '100vh' }}>
@@ -403,34 +470,76 @@ const Quotation = () => {
                         )}
                       </div>
                       <div className="col-md-4">
-                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Length (mm)</label>
+                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Length <span style={{ color: '#ffc107' }}>(600-2000 mm)</span></label>
                         <input
+                          name="length"
                           type="number"
-                          {...register('length')}
+                          {...register('length', { required: true, min: 600, max: 2000 })}
                           className="form-control bg-dark text-white border-0"
-                          placeholder="1200"
+                          placeholder="Enter length"
+                          min={600}
+                          max={2000}
                           style={{ fontSize: '1.4rem', padding: '0.75rem' }}
+                          required
+                          onChange={handleDimensionChange}
                         />
+                        {errors.length && (
+                          <div className="text-danger small">Length must be between 600 and 2000 mm.</div>
+                        )}
+                        {dimensionWarnings.length && (
+                          <div className="text-warning small mt-1">
+                            <AlertCircle size={14} className="me-1" />
+                            {dimensionWarnings.length}
+                          </div>
+                        )}
                       </div>
                       <div className="col-md-4">
-                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Width (mm)</label>
+                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Width <span style={{ color: '#ffc107' }}>(400-1500 mm)</span></label>
                         <input
+                          name="width"
                           type="number"
-                          {...register('width')}
+                          {...register('width', { required: true, min: 400, max: 1500 })}
                           className="form-control bg-dark text-white border-0"
-                          placeholder="800"
+                          placeholder="Enter width"
+                          min={400}
+                          max={1500}
                           style={{ fontSize: '1.4rem', padding: '0.75rem' }}
+                          required
+                          onChange={handleDimensionChange}
                         />
+                        {errors.width && (
+                          <div className="text-danger small">Width must be between 400 and 1500 mm.</div>
+                        )}
+                        {dimensionWarnings.width && (
+                          <div className="text-warning small mt-1">
+                            <AlertCircle size={14} className="me-1" />
+                            {dimensionWarnings.width}
+                          </div>
+                        )}
                       </div>
                       <div className="col-md-4">
-                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Height (mm)</label>
+                        <label className="form-label" style={{ fontSize: '1.2rem' }}>Height <span style={{ color: '#ffc107' }}>(100-300 mm)</span></label>
                         <input
+                          name="height"
                           type="number"
-                          {...register('height')}
+                          {...register('height', { required: true, min: 100, max: 300 })}
                           className="form-control bg-dark text-white border-0"
-                          placeholder="150"
+                          placeholder="Enter height"
+                          min={100}
+                          max={300}
                           style={{ fontSize: '1.4rem', padding: '0.75rem' }}
+                          required
+                          onChange={handleDimensionChange}
                         />
+                        {errors.height && (
+                          <div className="text-danger small">Height must be between 100 and 300 mm.</div>
+                        )}
+                        {dimensionWarnings.height && (
+                          <div className="text-warning small mt-1">
+                            <AlertCircle size={14} className="me-1" />
+                            {dimensionWarnings.height}
+                          </div>
+                        )}
                       </div>
                       <div className="col-md-6">
                         <label className="form-label" style={{ fontSize: '1.2rem' }}>Load Capacity (kg)</label>
@@ -578,6 +687,22 @@ const Quotation = () => {
                             <td>Shipping Estimate</td>
                             <td className="text-end">₹{(priceComponents.shipping ?? 0).toLocaleString()}</td>
                           </tr>
+                          {priceComponents.discount > 0 && (
+                            <tr style={{ background: '#1e3a1e', color: '#22c55e', fontWeight: 800, fontSize: '1.13rem' }}>
+                              <td>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                  {priceComponents.discountLabel || 'Discount'}
+                                  <span
+                                    title="Discounts are applied automatically for VIP, Bulk Orders, and other special customers. Contact support for more info."
+                                    style={{ cursor: 'pointer', marginLeft: 4 }}
+                                  >
+                                    <svg width="18" height="18" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info"><circle cx="9" cy="9" r="8"/><line x1="12" y1="12" x2="8" y2="12"/><line x1="10" y1="8" x2="10" y2="6"/></svg>
+                                  </span>
+                                </span>
+                              </td>
+                              <td className="text-end">-₹{priceComponents.discount.toLocaleString()}</td>
+                            </tr>
+                          )}
                           <tr style={{ fontWeight: 700 }}>
                             <td>Subtotal</td>
                             <td className="text-end">₹{(priceComponents.totalBeforeGst ?? 0).toLocaleString()}</td>

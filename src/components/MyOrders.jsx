@@ -115,7 +115,8 @@ const MyOrders = () => {
   };
 
   const handleFileDownload = (quoteId, fileName) => {
-    const downloadUrl = `http://localhost:8080/api/quotes/files/${quoteId}/${encodeURIComponent(fileName)}`;
+    // Extract folder from quoteId (assuming quoteId is the folder name)
+    const downloadUrl = `http://localhost:8080/api/download/${quoteId}/${encodeURIComponent(fileName)}`;
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.download = fileName;
@@ -124,7 +125,7 @@ const MyOrders = () => {
 
   const handleFilePreview = (quoteId, fileName) => {
     if (isImageFile(fileName)) {
-      const imageUrl = `http://localhost:8080/api/quotes/files/${quoteId}/${encodeURIComponent(fileName)}`;
+      const imageUrl = `http://localhost:8080/api/download/${quoteId}/${encodeURIComponent(fileName)}`;
       window.open(imageUrl, '_blank');
     } else {
       handleFileDownload(quoteId, fileName);

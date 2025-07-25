@@ -1,6 +1,6 @@
 import { useState, Suspense, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Ruler, Package, Save, Download, RotateCcw } from 'lucide-react';
+import { Ruler, Package, Save, Download, RotateCcw, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -149,6 +149,7 @@ const PalletBuilder = () => {
 
   const [savedDesigns, setSavedDesigns] = useState([]);
   const [isPaused, setIsPaused] = useState(false);
+  const [dimensionWarnings, setDimensionWarnings] = useState({});
 
   const materials = [
     { value: 'pine', label: 'Pine Wood', price: 1.2 },
@@ -215,7 +216,39 @@ const PalletBuilder = () => {
 
   const priceComponents = getPriceComponents();
 
+  const checkDimensionLimits = (name, value) => {
+    const numValue = Number(value);
+    const warnings = { ...dimensionWarnings };
+    if (name === 'length') {
+      if (numValue < 600) {
+        warnings.length = 'Length too small. Minimum is 600mm.';
+      } else if (numValue > 2000) {
+        warnings.length = 'Length too large. Maximum is 2000mm.';
+      } else {
+        delete warnings.length;
+      }
+    } else if (name === 'width') {
+      if (numValue < 400) {
+        warnings.width = 'Width too small. Minimum is 400mm.';
+      } else if (numValue > 1500) {
+        warnings.width = 'Width too large. Maximum is 1500mm.';
+      } else {
+        delete warnings.width;
+      }
+    } else if (name === 'height') {
+      if (numValue < 100) {
+        warnings.height = 'Height too small. Minimum is 100mm.';
+      } else if (numValue > 300) {
+        warnings.height = 'Height too large. Maximum is 300mm.';
+      } else {
+        delete warnings.height;
+      }
+    }
+    setDimensionWarnings(warnings);
+  };
+
   const handleSpecChange = (key, value) => {
+    checkDimensionLimits(key, value);
     setSpecs(prev => ({ ...prev, [key]: value }));
   };
 
@@ -305,6 +338,12 @@ const PalletBuilder = () => {
                         max="2000"
                         step="50"
                       />
+                      {dimensionWarnings.length && (
+                        <div className="text-warning small mt-1">
+                          <AlertCircle size={14} className="me-1" />
+                          {dimensionWarnings.length}
+                        </div>
+                      )}
                     </div>
                     <div className="col-4">
                       <label className="form-label small">Width</label>
@@ -317,6 +356,12 @@ const PalletBuilder = () => {
                         max="1500"
                         step="50"
                       />
+                      {dimensionWarnings.width && (
+                        <div className="text-warning small mt-1">
+                          <AlertCircle size={14} className="me-1" />
+                          {dimensionWarnings.width}
+                        </div>
+                      )}
                     </div>
                     <div className="col-4">
                       <label className="form-label small">Height</label>
@@ -329,6 +374,12 @@ const PalletBuilder = () => {
                         max="300"
                         step="10"
                       />
+                      {dimensionWarnings.height && (
+                        <div className="text-warning small mt-1">
+                          <AlertCircle size={14} className="me-1" />
+                          {dimensionWarnings.height}
+                        </div>
+                      )}
                     </div>
                     <div className="col-6">
                       <label className="form-label small">Load Capacity (kg)</label>

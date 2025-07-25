@@ -329,18 +329,38 @@ const Catalogue = () => {
                       ))}
                       
                       <div className="mt-4" style={{
-                        background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)',
-                        color: '#222',
+                        background: 'linear-gradient(90deg, #ffde7b 0%, #ffc837 100%)',
+                        color: '#232b39',
                         borderRadius: '1rem',
                         boxShadow: '0 4px 24px 0 rgba(255, 204, 51, 0.15)',
                         padding: '1.5rem',
-                        fontWeight: 500
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        marginBottom: '1rem',
                       }}>
-                        <h4 className="h6 mb-2" style={{ color: '#fff', fontWeight: 700, letterSpacing: '0.5px' }}>Applications</h4>
-                        <p className="mb-0" style={{ color: '#fff', fontWeight: 400 }}>
-                          This pallet type is ideal for {selectedProduct.type.toLowerCase()} applications, 
-                          offering reliable performance with a load capacity of {selectedProduct.loadCapacity}kg. 
-                          Perfect for various industrial and commercial use cases.
+                        <h4 className="h6 mb-2" style={{ color: '#232b39', fontWeight: 700, letterSpacing: '0.5px' }}>Applications</h4>
+                        <p className="mb-0" style={{ color: '#232b39', fontWeight: 400 }}>
+                          {selectedProduct.type === 'Heavy Duty' && (
+                            <>This pallet type is ideal for heavy duty applications, offering reliable performance with a load capacity of {selectedProduct.loadCapacity}kg. Perfect for various industrial and commercial use cases.</>
+                          )}
+                          {selectedProduct.type === 'Euro Pallet' && (
+                            <>Widely used for international shipping and logistics, ensuring compatibility and safety for global supply chains.</>
+                          )}
+                          {selectedProduct.type === 'Display Pallet' && (
+                            <>Perfect for retail and promotional displays, providing a lightweight and attractive platform for showcasing products.</>
+                          )}
+                          {selectedProduct.type === 'Eco-Friendly' && (
+                            <>Best suited for businesses seeking sustainable solutions, these pallets are made from recycled materials and support green initiatives.</>
+                          )}
+                          {selectedProduct.type === 'Custom Design' && (
+                            <>Tailored for unique requirements, these pallets are designed and built to fit your specific industrial or commercial needs.</>
+                          )}
+                          {selectedProduct.type === 'Export Grade' && (
+                            <>Compliant with international export regulations, these pallets are ideal for cross-border shipments and customs clearance.</>
+                          )}
+                          {['Heavy Duty','Euro Pallet','Display Pallet','Eco-Friendly','Custom Design','Export Grade'].indexOf(selectedProduct.type) === -1 && (
+                            <>Suitable for a wide range of applications in warehousing, logistics, and manufacturing.</>
+                          )}
                         </p>
                       </div>
                     </div>
